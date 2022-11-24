@@ -33,12 +33,39 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 	it = std::upper_bound(keys.begin(), keys.end(), key);
 	int dist = std::distance(keys.begin(), it);
 	keys.insert(it, key); //insert key in sorted order
-	v_subtree.insert(v_subtree.begin() + dist, child);//insert subtree at same position as the key
+	v_subtree.insert(v_subtree.begin() + dist + 1, child);//insert subtree at same position as the key
+	//TODO: najverovatnije postoji bug sa mestom insertovanja u subtree vektor
 	size_t middleIndex = ceil((double)m / 2); //left subtree can have more nodes
-	
+	size_t newKey = keys[middleIndex];
+	father->sz = middleIndex;
 	Node* newNode = new Node(this->m, false);
-	//leave allK
-	
+	newNode->sz = 0;
+	int i, j;
+	for (i = middleIndex + 1, j = 0; i < this->m; i++, j++) {
+		newNode->keys[j] = keys[i];
+		newNode->sz++;
+	}
+	for (i = middleIndex + 1, j = 0; i < this->m + 1; i++, j++) {
+		newNode->p.subtree[j] = v_subtree[i];
+	}
+	if (father == this->root) {// we make a new root, because we are splitting the root node
+		Node* newRoot = new Node(this->m, false);
+		newRoot->sz = 1;
+		this->root = newRoot;
+		root->keys[0] = newKey;
+		if (key > newKey) {
+			root->p.subtree[0] = father;
+			root->p.subtree[1] = newNode;
+		}
+		else {
+			root->p.subtree[1] = father;
+			root->p.subtree[0] = newNode;
+		}
+		newNode->father = newRoot;
+		this->Print();
+	}
+
+
 }
 
 BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
@@ -108,8 +135,8 @@ bool BPlusTree::Insert(size_t key, Data* data)
 	it = std::upper_bound(keys.begin(), keys.end(), key);
 	int dist = std::distance(keys.begin(), it);
 	keys.insert(it, key); //insert key in sorted order
-	v_data.insert(v_data.begin() + dist, data);//insert subtree at same position as the key
-	
+	v_data.insert(v_data.begin() + dist+1, data);//insert subtree at same position as the key
+
 	newLeaf->p.subtree[leaf->m - 1] = leaf->p.subtree[leaf->m - 1];
 	leaf->p.subtree[leaf->m - 1] = newLeaf; //create a link between leafs
 	size_t oldsz = ceil((double)m / 2);
@@ -161,32 +188,22 @@ void BPlusTree::Print()
 {
 	std::queue<Node*> q;
 	q.push(this->root);
-	q.push(nullptr);
 	while (!q.empty()) {
-		Node* t = q.front();
-		q.pop();
-		if (t == nullptr) {
-			std::cout << std::endl;
-			continue;
-		}
-		
-		for (size_t i = 0; i < t->sz; i++)
-		{
-			std::cout << t->keys[i] << "|";
-			if (!t->isLeaf) q.push((t->p.subtree[i]));
-		}
-		if (!t->isLeaf) q.push(t->p.subtree[t->sz]);
+		int cnt = q.size();
+		while (cnt) {
+			Node* t = q.front();
+			q.pop();
+			for (size_t i = 0; i < t->sz; i++)
+			{
+				std::cout << t->keys[i] << "|";
+				if (!t->isLeaf) q.push((t->p.subtree[i]));
+			}
+			if (!t->isLeaf) q.push(t->p.subtree[t->sz]);
 
-		std::cout << "\t";
-		if (!q.empty()) q.push(nullptr);
-	}
-	/*Node* curr = root;
-	while (!curr->isLeaf) curr = curr->p.subtree[0];
-	while (curr != nullptr) {
-		for (size_t i = 0; i < curr->sz; i++)
-		{
-			std::cout << curr->keys[i] << "|";
+			std::cout << "\t";
+			cnt--;
 		}
-		curr = curr->p.subtree[this->m - 1];
-	}*/
+		std::cout << std:: endl;
+		
+	}
 }
