@@ -21,9 +21,10 @@ private:
 	size_t m;
 #pragma endregion
 #pragma region methods
-	void insertInternalNode(size_t key, Data* data);
+	void insertInternalNode(size_t key, Node* child, Node* father);
 #pragma endregion
 public:
+	size_t maxKey = LLONG_MIN;
 	BPlusTree(size_t m) {
 		this->m = m;
 		this->root = nullptr;
