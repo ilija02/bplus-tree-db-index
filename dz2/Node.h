@@ -24,14 +24,6 @@ struct Node {
 		for (size_t i = 0; i < m; this->p.subtree[i++] = nullptr);
 	}
 	bool isFull() { return sz == m - 1; }
-	bool szInternalNode() {
-		//returns if number of keys in node satisfies the condition for internal nodes
-		return sz >= (ceil(static_cast<double>(m) / 2) - 1);
-	}
-	bool szLeafNode() {
-		//returns if number of keys in node satisfies the condition for leaf nodes
-		return sz >= m / 2;
-	}
 	//for root minimum number of keys is 1, and minimum number of subtrees is 2
 
 };
