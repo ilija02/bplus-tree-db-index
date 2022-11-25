@@ -1,5 +1,5 @@
 #include "BPlusTree.h"
-
+#include "Helpers.h"
 #pragma region Load
 BPlusTree* BPlusTree::FromFile(size_t m, std::string fname)
 {
@@ -159,7 +159,7 @@ bool BPlusTree::Insert(size_t key, Data* data)
 #pragma region Search
 bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent, size_t* took_steps, size_t* idx)
 {
-	*took_steps = 0;
+	*took_steps = 1;
 	if (this->root == nullptr) return false;
 	Node* curr = this->root;
 	while (!curr->isLeaf) {
@@ -212,7 +212,6 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 			curr = curr->p.subtree[i];
 		}
 
-
 	}
 	leaf = curr;
 	//we are at leaf level now, search inside leaf node for key	
@@ -250,6 +249,43 @@ Node* BPlusTree::getParent(size_t key)
 
 
 }
+
+void BPlusTree::SearchMultiple(std::vector<size_t>& keys, size_t* tookSteps, std::string filename)
+{
+	std::ofstream out(filename, std::ios_base::out | std::ios_base::trunc);
+	*tookSteps = 0;
+	for (size_t i = 0; i < keys.size(); i++)
+	{
+		size_t took_steps_i, idx, key;
+		Node* leaf, * junk;
+		if (SearchSingle(keys[i], leaf, junk, &took_steps_i, &idx)) {
+			*tookSteps += took_steps_i;
+			helpers::writeNodeToFile(leaf->p.data[idx], out);
+		}
+	}
+	out.close();
+}
+void BPlusTree::SearchMultipleSuccessive(size_t startKey, size_t k, size_t* took_steps, std::string filename)
+{
+	Node* curr, * junk;
+	size_t idx;
+	std::ofstream out(filename, std::ios_base::out | std::ios_base::trunc);
+	SearchSingle(startKey, curr, junk, took_steps, &idx);
+	size_t i = 0;
+	while (i < k && curr!=nullptr) {
+		while (idx < curr->sz && i<k) {
+
+			
+			helpers::writeNodeToFile(curr->p.data[idx], out);
+			idx++;
+			i++;
+		}
+		idx = 0;
+		curr = curr->p.subtree[curr->m - 1];//next in linked list
+		(*took_steps)++;
+	}
+	return;
+}
 #pragma region Print
 void BPlusTree::Print()
 {
@@ -273,4 +309,5 @@ void BPlusTree::Print()
 
 	}
 }
+
 #pragma endregion

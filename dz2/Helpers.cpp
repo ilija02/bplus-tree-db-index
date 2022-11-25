@@ -90,17 +90,36 @@ void helpers::mainLoop() {
 			break;
 		}
 		case 6: {
-
+			if (!nullCheckAndError(b)) continue;
+			size_t k, key, took_steps;
+			std::vector<size_t> keys;
+			std::cout << "Broj kljuceva na osnovu kojih se vrsi pretraga: ";
+			std::cin >> k;
+			keys.resize(k);
+			std::cout <<k<<" vrednosti odvojenih blanko znakom: ";
+			for (int i = 0; i < k; i++) {
+				std::cin >> key;
+				keys[i] = key;
+			}
+			b->SearchMultiple(keys, &took_steps);
+			std::cout << "Za pretragu je bilo potrebno " << took_steps << " koraka." << std::endl;
 			break;
 		}
 		case 7: {
-
+			if (!nullCheckAndError(b)) continue;
+			size_t k, startKey, took_steps;
+			std::cout << "Primarni kljuc pocetnog zapisa: ";
+			std::cin >> startKey;
+			std::cout << "Broj primarnih kljuceva k: ";
+			std::cin >> k;
+			b->SearchMultipleSuccessive(startKey, k, &took_steps);
+			std::cout << "Podaci uspesno upisani u fajl" << std::endl;
+			std::cout << "Za pretragu je bilo potrebno "<<took_steps<<" koraka" << std::endl;
 			break;
 		}
 		}
 	}
 }
-
 
 bool helpers::nullCheckAndError(BPlusTree* b)
 {
@@ -109,4 +128,12 @@ bool helpers::nullCheckAndError(BPlusTree* b)
 		return false;
 	}
 	return true;
+}
+
+void helpers::writeNodeToFile(Data* d, std::ofstream& out)
+{
+	std::stringstream ss;
+	ss << std::fixed <<std::setprecision(2)<< d->ca_id << "|" << d->ca_b_id << "|" << d->ca_c_id << "|" << d->ca_name << "|" << d->ca_tax_st << "|" << d->ca_bal << std::endl;
+	out << ss.rdbuf();
+	return;
 }
