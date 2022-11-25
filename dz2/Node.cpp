@@ -16,3 +16,14 @@ void Node::printNodeKeys()
 	for (size_t i = 0; i < sz; i++) std::cout << keys[i] << "|";
 	for (size_t i = 0; i < m - sz - 1; i++) std::cout << "#|";
 }
+
+void Node::printNodeData(size_t idx)
+{
+	Data* d = this->p.data[idx];
+	std::cout << "\tca_id: " << d->ca_id << std::endl;
+	std::cout << "\tca_b_id: " << d->ca_b_id << std::endl;;
+	std::cout << "\tca_c_id: " << d->ca_c_id << std::endl;;
+	std::cout << "\tca_name: " << d->ca_name << std::endl;;
+	std::cout << "\tca_tax_st: " << d->ca_tax_st << std::endl;;
+	std::cout << "\tca_bal: " << d->ca_bal << std::endl;;
+}

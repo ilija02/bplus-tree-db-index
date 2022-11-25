@@ -28,12 +28,12 @@ int helpers::getSelectedMenuOption()
 
 void helpers::mainLoop() {
 	int selectedOption;
-	BPlusTree *b = nullptr;
+	BPlusTree* b = nullptr;
 	while (selectedOption = getSelectedMenuOption()) {
 		switch (selectedOption) {
 		case 1: {
 			size_t m;
-			std::string fname="CustomerAccount20.txt";
+			std::string fname = "CustomerAccount20.txt";
 			do {
 				std::cout << "\tRed stabla m: ";
 				std::cin >> m;
@@ -64,26 +64,37 @@ void helpers::mainLoop() {
 			std::cout << "\tca_bal: ";
 			std::cin >> d->ca_bal;
 			if (!b->Insert(d->ca_id, d)) {
-				std::cout << std::endl<< "\033[1;31mGreska, kljuc vec postoji\033[0m" << std::endl;
+				std::cout << std::endl << "\033[1;31mGreska, kljuc vec postoji\033[0m" << std::endl;
 				continue;
 			}
 			b->Print();
 			break;
 		}
 		case 4: {
-			std::cout << "Not implemented" << std::endl;
+			std::cout << "Delete not implemented" << std::endl;
 			break;
 		}
 		case 5: {
-			
+			if (!nullCheckAndError(b)) continue;
+			size_t took_steps, idx, key;
+			Node* leaf, * junk;
+			std::cout << "Kljuc na osnovu kojeg se vrsi pretraga: ";
+			std::cin >> key;
+			if (!b->SearchSingle(key, leaf, junk, &took_steps, &idx)) {
+
+				std::cout << std::endl << "\033[1;31mGreska, kljuc ne postoji\033[0m" << std::endl;
+				continue;
+			}
+			std::cout << "Za pretragu je bilo potrebno " << took_steps << " koraka. Podaci iz cvora: "<<std::endl;
+			leaf->printNodeData(idx);
 			break;
 		}
 		case 6: {
-			
+
 			break;
 		}
 		case 7: {
-			
+
 			break;
 		}
 		}
@@ -91,7 +102,7 @@ void helpers::mainLoop() {
 }
 
 
-bool helpers::nullCheckAndError(BPlusTree *b)
+bool helpers::nullCheckAndError(BPlusTree* b)
 {
 	if (b == nullptr) {
 		std::cout << "\033[1;31mGreska, morate prvo ucitati/generisati B+ stablo\033[0m" << std::endl;

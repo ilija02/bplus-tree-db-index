@@ -12,7 +12,7 @@ BPlusTree* BPlusTree::FromFile(size_t m, std::string fname)
 		std::string tmp_s = "";
 		std::stringstream ss(line);
 		std::getline(ss, tmp_s, '|');
-		d->ca_id = std::stoll(tmp_s)%100;
+		d->ca_id = std::stoll(tmp_s) % 100;
 		std::getline(ss, tmp_s, '|');
 		d->ca_b_id = std::stoll(tmp_s);
 		std::getline(ss, tmp_s, '|');
@@ -103,7 +103,7 @@ bool BPlusTree::Insert(size_t key, Data* data)
 		root->sz = 1;
 		return true;
 	}
-	Node* leaf, *parent;
+	Node* leaf, * parent;
 	if (this->SearchSingle(key, leaf, parent)) return false;
 	if (!leaf->isFull()) {
 		int i = 0;
@@ -157,6 +157,41 @@ bool BPlusTree::Insert(size_t key, Data* data)
 #pragma endregion
 
 #pragma region Search
+bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent, size_t* took_steps, size_t* idx)
+{
+	*took_steps = 0;
+	if (this->root == nullptr) return false;
+	Node* curr = this->root;
+	while (!curr->isLeaf) {
+		size_t i;
+		for (i = 0; i < curr->sz; i++)
+		{
+			if (key <=curr->keys[i]) {
+				parent = curr;
+				(*took_steps)++;
+				curr = curr->p.subtree[i];
+				break;
+			}
+		}
+		if (i == curr->sz)//if key > all keys in node
+		{
+			(*took_steps)++;
+			parent = curr;
+			curr = curr->p.subtree[i];
+		}
+
+
+	}
+	leaf = curr;
+	//we are at leaf level now, search inside leaf node for key	
+	for (size_t i = 0; i < curr->sz; i++) if (key == curr->keys[i]) {
+		*idx = i;
+		return true;
+	}
+	*idx = -1;
+	return false;
+}
+
 bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 {
 	if (this->root == nullptr) return false;
@@ -165,7 +200,7 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 		size_t i;
 		for (i = 0; i < curr->sz; i++)
 		{
-			if (key < curr->keys[i]) {
+			if (key <= curr->keys[i]) {
 				parent = curr;
 				curr = curr->p.subtree[i];
 				break;
@@ -176,7 +211,7 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 			parent = curr;
 			curr = curr->p.subtree[i];
 		}
-		
+
 
 	}
 	leaf = curr;
@@ -194,7 +229,7 @@ Node* BPlusTree::getParent(size_t key)
 		size_t i;
 		for (i = 0; i < curr->sz; i++)
 		{
-			if (key==curr->keys[i]) {
+			if (key == curr->keys[i]) {
 				return parent;
 			}
 			if (key < curr->keys[i]) {
@@ -217,7 +252,8 @@ Node* BPlusTree::getParent(size_t key)
 }
 #pragma region Print
 void BPlusTree::Print()
-{	std::queue<Node*> q;
+{
+	std::queue<Node*> q;
 	q.push(this->root);
 	while (!q.empty()) {
 		int cnt = q.size();
@@ -233,8 +269,8 @@ void BPlusTree::Print()
 			std::cout << "-";
 			cnt--;
 		}
-		std::cout << std::endl<<std::endl;
-		
+		std::cout << std::endl << std::endl;
+
 	}
 }
 #pragma endregion
