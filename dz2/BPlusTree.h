@@ -28,12 +28,11 @@ public:
 	BPlusTree(size_t m) {
 		this->m = m;
 		this->root = nullptr;
-		this->height = 0;
 	} //TODO: move constructor into private section
 	Node* root;
 	static BPlusTree* FromFile(size_t m, const char* fname);
 	bool Insert(size_t key, Data* data);
-	bool SearchSingle(size_t key, Node*& leaf);
+	bool SearchSingle(size_t key, Node*& leaf, Node*& parent);
 	void Print();
 };
 
