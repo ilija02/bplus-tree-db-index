@@ -1,5 +1,6 @@
 #include "BPlusTree.h"
 
+#pragma region Load
 BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
 {
 	BPlusTree* b = new BPlusTree(m);
@@ -28,7 +29,9 @@ BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
 	infile.close();
 	return b;
 }
+#pragma endregion
 
+#pragma region Insert
 void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 {
 	if (!father->isFull()) {
@@ -57,20 +60,20 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 	int dist = std::distance(keys.begin(), it);
 	keys.insert(it, key); //insert key in sorted order
 	v_subtree.insert(v_subtree.begin() + dist + 1, child);//insert subtree at same position as the key
-	//TODO: najverovatnije postoji bug sa mestom insertovanja u subtree vektor
 	size_t middleIndex = ceil((double)m / 2); //left subtree can have more nodes
 	size_t newKey = keys[middleIndex];
 	father->sz = middleIndex;
 	Node* newNode = new Node(this->m, false);
 	newNode->sz = 0;
 	int i, j;
+	//transfer keys
 	for (i = middleIndex + 1, j = 0; i < this->m; i++, j++) {
 		newNode->keys[j] = keys[i];
 		newNode->sz++;
-	}
+	}//transfer subtrees
 	for (i = middleIndex + 1, j = 0; i < this->m + 1; i++, j++) {
 		newNode->p.subtree[j] = v_subtree[i];
-	}
+	}//check if splitting into root
 	if (father == this->root) {// we make a new root, because we are splitting the root node
 		Node* newRoot = new Node(this->m, false);
 		newRoot->sz = 1;
@@ -84,6 +87,10 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 			root->p.subtree[1] = father;
 			root->p.subtree[0] = newNode;
 		}
+	}
+	else {
+		Node* grandparent = getParent(father->keys[0]);
+		insertInternalNode(newKey, newNode, grandparent);
 	}
 }
 
@@ -150,6 +157,9 @@ bool BPlusTree::Insert(size_t key, Data* data)
 	return true;
 }
 
+#pragma endregion
+
+#pragma region Search
 bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 {
 	if (this->root == nullptr) return false;
@@ -178,6 +188,36 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 	return false;
 }
 
+Node* BPlusTree::getParent(size_t key)
+{
+	Node* parent = nullptr;
+	Node* curr = this->root;
+	if (this->root == nullptr) return nullptr;
+	while (!curr->isLeaf) {
+		size_t i;
+		for (i = 0; i < curr->sz; i++)
+		{
+			if (key==curr->keys[i]) {
+				return parent;
+			}
+			if (key < curr->keys[i]) {
+				parent = curr;
+				curr = curr->p.subtree[i];
+				break;
+			}
+		}
+		if (i == curr->sz)//if key > all keys in node
+		{
+			parent = curr;
+			curr = curr->p.subtree[i];
+		}
+
+
+	}
+	return nullptr;
+
+
+}
 #pragma region Print
 void BPlusTree::Print()
 {	std::queue<Node*> q;
