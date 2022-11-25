@@ -34,6 +34,8 @@ public:
 	bool Insert(size_t key, Data* data);
 	bool SearchSingle(size_t key, Node*& leaf, Node*& parent, size_t *took_steps, size_t* idx);//last two pointer parameters are used when finding the data of a node with given key
 	bool SearchSingle(size_t key, Node*& leaf, Node*& parent);
+	void SearchMultiple(std::vector<size_t>& keys, size_t* tookSteps, std::string filename = "found.txt");
+	void SearchMultipleSuccessive(size_t startKey, size_t k, size_t* tookSteps, std::string filename = "found.txt");
 	void Print();
 };
 
