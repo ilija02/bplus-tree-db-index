@@ -1,7 +1,6 @@
-#include "BPlusTree.h"
+#include "Helpers.h"
 
 int main() {
-	BPlusTree *bpt = BPlusTree::FromFile(4, "CustomerAccount20.txt");
-	bpt->Print();
+	helpers::mainLoop();
 	return 0;
 }
