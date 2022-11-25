@@ -130,10 +130,3 @@ bool helpers::nullCheckAndError(BPlusTree* b)
 	return true;
 }
 
-void helpers::writeNodeToFile(Data* d, std::ofstream& out)
-{
-	std::stringstream ss;
-	ss << std::fixed <<std::setprecision(2)<< d->ca_id << "|" << d->ca_b_id << "|" << d->ca_c_id << "|" << d->ca_name << "|" << d->ca_tax_st << "|" << d->ca_bal << std::endl;
-	out << ss.rdbuf();
-	return;
-}

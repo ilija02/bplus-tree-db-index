@@ -16,13 +16,9 @@
 class BPlusTree
 {
 private:
-#pragma region fields
 	size_t m;
-#pragma endregion
-#pragma region methods
 	void insertInternalNode(size_t key, Node* child, Node* father);
 	Node* getParent(size_t key);
-#pragma endregion
 public:
 	size_t maxKey = LLONG_MIN;
 	BPlusTree(size_t m) {
