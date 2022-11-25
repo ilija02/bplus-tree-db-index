@@ -1,13 +1,36 @@
 #include "BPlusTree.h"
 
-
-
-
-
+BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
+{
+	BPlusTree* b = new BPlusTree(m);
+	std::ifstream infile;
+	infile.open(fname);
+	std::string line = "";
+	while (std::getline(infile, line)) {
+		Data* d = new Data();
+		std::string tmp_s = "";
+		std::stringstream ss(line);
+		std::getline(ss, tmp_s, '|');
+		d->ca_id = std::stoll(tmp_s);
+		std::getline(ss, tmp_s, '|');
+		d->ca_b_id = std::stoll(tmp_s);
+		std::getline(ss, tmp_s, '|');
+		d->ca_c_id = std::stoll(tmp_s);
+		std::getline(ss, d->ca_name, '|');
+		std::getline(ss, tmp_s, '|');
+		d->ca_tax_st = std::stoll(tmp_s);
+		std::getline(ss, tmp_s, '|');
+		d->ca_bal = std::stod(tmp_s);
+		b->Insert(d->ca_id, d);
+		b->Print();
+		std::cout << "################################################\n\n";
+	}
+	infile.close();
+	return b;
+}
 
 void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 {
-	child->father = father;
 	if (!father->isFull()) {
 		int i = 0;
 		int j;
@@ -61,40 +84,7 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 			root->p.subtree[1] = father;
 			root->p.subtree[0] = newNode;
 		}
-		newNode->father = newRoot;
-		this->Print();
 	}
-
-
-}
-
-BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
-{
-	BPlusTree* b = new BPlusTree(m);
-	std::ifstream infile;
-	infile.open(fname);
-	std::string line = "";
-	while (std::getline(infile, line)) {
-		Data* d = new Data();
-		std::string tmp_s = "";
-		std::stringstream ss(line);
-		std::getline(ss, tmp_s, '|');
-		d->ca_id = std::stoll(tmp_s);
-		std::getline(ss, tmp_s, '|');
-		d->ca_b_id = std::stoll(tmp_s);
-		std::getline(ss, tmp_s, '|');
-		d->ca_c_id = std::stoll(tmp_s);
-		std::getline(ss, d->ca_name, '|');
-		std::getline(ss, tmp_s, '|');
-		d->ca_tax_st = std::stoll(tmp_s);
-		std::getline(ss, tmp_s, '|');
-		d->ca_bal = std::stod(tmp_s);
-		b->Insert(d->ca_id, d);
-		b->Print();
-		std::cout << "################################################\n\n";
-	}
-	infile.close();
-	return b;
 }
 
 bool BPlusTree::Insert(size_t key, Data* data)
@@ -109,8 +99,8 @@ bool BPlusTree::Insert(size_t key, Data* data)
 		root->sz = 1;
 		return true;
 	}
-	Node* leaf;
-	if (this->SearchSingle(key, leaf)) return false;
+	Node* leaf, *parent;
+	if (this->SearchSingle(key, leaf, parent)) return false;
 	if (!leaf->isFull()) {
 		int i = 0;
 		int j;
@@ -135,7 +125,7 @@ bool BPlusTree::Insert(size_t key, Data* data)
 	it = std::upper_bound(keys.begin(), keys.end(), key);
 	int dist = std::distance(keys.begin(), it);
 	keys.insert(it, key); //insert key in sorted order
-	v_data.insert(v_data.begin() + dist+1, data);//insert subtree at same position as the key
+	v_data.insert(v_data.begin() + dist, data);//insert subtree at same position as the key
 
 	newLeaf->p.subtree[leaf->m - 1] = leaf->p.subtree[leaf->m - 1];
 	leaf->p.subtree[leaf->m - 1] = newLeaf; //create a link between leafs
@@ -155,14 +145,12 @@ bool BPlusTree::Insert(size_t key, Data* data)
 		newRoot->p.subtree[1] = newLeaf;
 		newRoot->keys[0] = leaf->keys[leaf->sz - 1]; //rightmost key in left subtree
 		this->root = newRoot;
-		leaf->father = newRoot;
-		newLeaf->father = newRoot;
 	}
-	else this->insertInternalNode(leaf->keys[leaf->sz - 1], newLeaf, leaf->father);
+	else this->insertInternalNode(leaf->keys[leaf->sz - 1], newLeaf, parent);
 	return true;
 }
 
-bool BPlusTree::SearchSingle(size_t key, Node*& leaf)
+bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 {
 	if (this->root == nullptr) return false;
 	Node* curr = this->root;
@@ -171,11 +159,17 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf)
 		for (i = 0; i < curr->sz; i++)
 		{
 			if (key < curr->keys[i]) {
+				parent = curr;
 				curr = curr->p.subtree[i];
 				break;
 			}
 		}
-		if (i == curr->sz) curr = curr->p.subtree[i]; //if key > all keys in node
+		if (i == curr->sz)//if key > all keys in node
+		{
+			parent = curr;
+			curr = curr->p.subtree[i];
+		}
+		
 
 	}
 	leaf = curr;
@@ -184,9 +178,9 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf)
 	return false;
 }
 
+#pragma region Print
 void BPlusTree::Print()
-{
-	std::queue<Node*> q;
+{	std::queue<Node*> q;
 	q.push(this->root);
 	while (!q.empty()) {
 		int cnt = q.size();
@@ -195,15 +189,15 @@ void BPlusTree::Print()
 			q.pop();
 			for (size_t i = 0; i < t->sz; i++)
 			{
-				std::cout << t->keys[i] << "|";
 				if (!t->isLeaf) q.push((t->p.subtree[i]));
 			}
 			if (!t->isLeaf) q.push(t->p.subtree[t->sz]);
-
-			std::cout << "\t";
+			t->printNode();
+			std::cout << " - ";
 			cnt--;
 		}
 		std::cout << std:: endl;
 		
 	}
 }
+#pragma endregion

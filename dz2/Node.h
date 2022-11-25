@@ -9,7 +9,6 @@ union ptr {
 struct Node {
 	size_t sz, m;
 	size_t* keys;
-	Node* father;
 	ptr p;
 	bool isLeaf;
 
@@ -17,7 +16,6 @@ struct Node {
 	{
 		this->m = m;
 		this->isLeaf = isLeaf;
-		this->father = nullptr;
 		this->sz = 0;
 		this->p.subtree = new Node* [m]; //for leaf nodes, children[m-1] is the pointer for linked list between leaf nodes
 		this->keys = new size_t[m - 1];
@@ -25,7 +23,11 @@ struct Node {
 	}
 	bool isFull() { return sz == m - 1; }
 	//for root minimum number of keys is 1, and minimum number of subtrees is 2
-
+	void printNode() {
+		std::cout << "|";
+		for (size_t i = 0; i <sz; i++) std::cout << " " << keys[i]%100 << " |";
+		for (size_t i = 0; i < m - sz-1; i++) std::cout << " #### |";
+	}
 };
 
 struct Data {
