@@ -18,6 +18,7 @@ struct Node {
 	bool isFull() { return sz == m - 1; }
 	//for root minimum number of keys is 1, and minimum number of subtrees is 2
 	void printNodeKeys();
+	void printNodeData(size_t idx);
 
 };
 
