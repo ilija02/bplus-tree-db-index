@@ -30,7 +30,7 @@ public:
 		this->root = nullptr;
 	} //TODO: move constructor into private section
 	Node* root;
-	static BPlusTree* FromFile(size_t m, const char* fname);
+	static BPlusTree* FromFile(size_t m, std::string fname);
 	bool Insert(size_t key, Data* data);
 	bool SearchSingle(size_t key, Node*& leaf, Node*& parent);
 	void Print();

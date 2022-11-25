@@ -1,4 +1,10 @@
 #pragma once
 #include<iostream>
+#include "BPlusTree.h"
+#include<cstdio>
 #define ZAD1_NR_OPTIONS 7
-int getSelectedMenuOption();
+namespace helpers {
+	int getSelectedMenuOption();
+	void mainLoop();
+	bool nullCheckAndError(BPlusTree* b);
+}

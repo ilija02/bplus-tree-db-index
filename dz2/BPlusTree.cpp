@@ -1,7 +1,7 @@
 #include "BPlusTree.h"
 
 #pragma region Load
-BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
+BPlusTree* BPlusTree::FromFile(size_t m, std::string fname)
 {
 	BPlusTree* b = new BPlusTree(m);
 	std::ifstream infile;
@@ -12,7 +12,7 @@ BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
 		std::string tmp_s = "";
 		std::stringstream ss(line);
 		std::getline(ss, tmp_s, '|');
-		d->ca_id = std::stoll(tmp_s);
+		d->ca_id = std::stoll(tmp_s)%100;
 		std::getline(ss, tmp_s, '|');
 		d->ca_b_id = std::stoll(tmp_s);
 		std::getline(ss, tmp_s, '|');
@@ -23,8 +23,6 @@ BPlusTree* BPlusTree::FromFile(size_t m, const char* fname)
 		std::getline(ss, tmp_s, '|');
 		d->ca_bal = std::stod(tmp_s);
 		b->Insert(d->ca_id, d);
-		b->Print();
-		std::cout << "################################################\n\n";
 	}
 	infile.close();
 	return b;
@@ -49,7 +47,7 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 		father->sz++;
 		return;
 	}
-	std::cout << "Splitting internal node when inserting " << key << std::endl;
+	//std::cout << "Splitting internal node when inserting " << key << std::endl; Debug
 	std::vector<size_t> keys;
 	std::vector<Node*> v_subtree;
 	std::vector<size_t>::iterator it;
@@ -96,7 +94,6 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 
 bool BPlusTree::Insert(size_t key, Data* data)
 {
-	this->maxKey = this->maxKey < key ? key : this->maxKey;
 	Node* newLeaf = new Node(this->m, true);
 	//check if BPlusTree isn't created
 	if (this->root == nullptr) {
@@ -232,11 +229,11 @@ void BPlusTree::Print()
 				if (!t->isLeaf) q.push((t->p.subtree[i]));
 			}
 			if (!t->isLeaf) q.push(t->p.subtree[t->sz]);
-			t->printNode();
-			std::cout << " - ";
+			t->printNodeKeys();
+			std::cout << "-";
 			cnt--;
 		}
-		std::cout << std:: endl;
+		std::cout << std::endl<<std::endl;
 		
 	}
 }
