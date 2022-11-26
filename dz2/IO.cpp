@@ -12,7 +12,7 @@ BPlusTree* BPlusTree::FromFile(size_t m, std::string fname)
 		std::string tmp_s = "";
 		std::stringstream ss(line);
 		std::getline(ss, tmp_s, '|');
-		d->ca_id = std::stoll(tmp_s) % 100;
+		d->ca_id = std::stoll(tmp_s)%10000;
 		std::getline(ss, tmp_s, '|');
 		d->ca_b_id = std::stoll(tmp_s);
 		std::getline(ss, tmp_s, '|');

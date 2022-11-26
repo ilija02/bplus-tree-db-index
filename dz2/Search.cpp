@@ -5,8 +5,10 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent, size_t* too
 {
 	*took_steps = 1;
 	if (this->root == nullptr) return false;
+	bool skip;
 	Node* curr = this->root;
 	while (!curr->isLeaf) {
+		skip = false;
 		size_t i;
 		for (i = 0; i < curr->sz; i++)
 		{
@@ -14,10 +16,11 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent, size_t* too
 				parent = curr;
 				(*took_steps)++;
 				curr = curr->p.subtree[i];
+				skip = true;
 				break;
 			}
 		}
-		if (i == curr->sz)//if key > all keys in node
+		if (!skip && i == curr->sz)//if key > all keys in node
 		{
 			(*took_steps)++;
 			parent = curr;
@@ -40,17 +43,20 @@ bool BPlusTree::SearchSingle(size_t key, Node*& leaf, Node*& parent)
 {
 	if (this->root == nullptr) return false;
 	Node* curr = this->root;
+	bool skip;
 	while (!curr->isLeaf) {
+		skip = false;
 		size_t i;
 		for (i = 0; i < curr->sz; i++)
 		{
 			if (key <= curr->keys[i]) {
 				parent = curr;
 				curr = curr->p.subtree[i];
+				skip = true;
 				break;
 			}
 		}
-		if (i == curr->sz)//if key > all keys in node
+		if (!skip && i == curr->sz)//if key > all keys in node
 		{
 			parent = curr;
 			curr = curr->p.subtree[i];
