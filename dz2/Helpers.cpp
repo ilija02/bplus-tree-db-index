@@ -33,7 +33,7 @@ void helpers::mainLoop() {
 		switch (selectedOption) {
 		case 1: {
 			size_t m;
-			std::string fname = "CustomerAccount20.txt";
+			std::string fname = "CustomerAccount2500.txt";
 			do {
 				std::cout << "\tRed stabla m: ";
 				std::cin >> m;
@@ -67,7 +67,7 @@ void helpers::mainLoop() {
 				std::cout << std::endl << "\033[1;31mGreska, kljuc vec postoji\033[0m" << std::endl;
 				continue;
 			}
-			b->Print();
+			//b->Print();
 			break;
 		}
 		case 4: {
