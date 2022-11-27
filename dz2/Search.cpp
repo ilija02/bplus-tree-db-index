@@ -100,6 +100,7 @@ Node* BPlusTree::getParent(size_t key)
 
 }
 
+
 void BPlusTree::SearchMultiple(std::vector<size_t>& keys, size_t* tookSteps, std::string filename)
 {
 	std::ofstream out(filename, std::ios_base::out | std::ios_base::trunc);
