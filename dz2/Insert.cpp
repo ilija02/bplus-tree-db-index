@@ -29,8 +29,7 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 		keys.insert(it, key); //insert key in sorted order
 		v_subtree.insert(v_subtree.begin() + dist + 1, child);//insert subtree at same position as the key
 		size_t middleIndex;
-		if (m % 2 == 0) middleIndex = m/2+1; //left subtree can have more nodes
-		else middleIndex = m / 2;
+		middleIndex = m / 2;
 		size_t newKey = keys[middleIndex];
 		father->sz = middleIndex;
 		Node* newNode = new Node(this->m, false);
