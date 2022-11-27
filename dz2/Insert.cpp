@@ -2,66 +2,74 @@
 
 void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 {
-	if (!father->isFull()) {
-		int i = 0;
-		int j;
-		while (key > father->keys[i]) i++;
-		for (j = father->sz - 1; j >= i; j--) {
-			father->keys[i] = father->keys[j];
+	
+	while (true) {
+		std::vector<size_t> keys;
+		std::vector<Node*> v_subtree;
+		std::vector<size_t>::iterator it;
+		if (!father->isFull()) {
+			int i = 0;
+			int j;
+			while (key > father->keys[i]) i++;
+			for (j = father->sz - 1; j >= i; j--) {
+				father->keys[i] = father->keys[j];
+			}
+			father->keys[i] = key;
+			for (j = father->sz; j > i; j--) {
+				father->p.subtree[j + 1] = father->p.subtree[j];
+			}
+			father->p.subtree[j + 1] = child;
+			father->sz++;
+			return;
 		}
-		father->keys[i] = key;
-		for (j = father->sz; j > i; j--) {
-			father->p.subtree[j + 1] = father->p.subtree[j];
-		}
-		father->p.subtree[j + 1] = child;
-		father->sz++;
-		return;
-	}
-	//std::cout << "Splitting internal node when inserting " << key << std::endl; Debug
-	std::vector<size_t> keys;
-	std::vector<Node*> v_subtree;
-	std::vector<size_t>::iterator it;
-	//insert new leaf and subtrees into vectors
-	keys.insert(keys.end(), &father->keys[0], &father->keys[father->sz]);
-	v_subtree.insert(v_subtree.end(), &father->p.subtree[0], &father->p.subtree[m]);
-	it = std::upper_bound(keys.begin(), keys.end(), key);
-	int dist = std::distance(keys.begin(), it);
-	keys.insert(it, key); //insert key in sorted order
-	v_subtree.insert(v_subtree.begin() + dist + 1, child);//insert subtree at same position as the key
-	size_t middleIndex;
-	if (m % 2 == 0) middleIndex = ceil((double)m / 2); //left subtree can have more nodes
-	else middleIndex = m / 2;
-	size_t newKey = keys[middleIndex];
-	father->sz = middleIndex;
-	Node* newNode = new Node(this->m, false);
-	newNode->sz = 0;
-	int i, j;
-	//transfer keys
-	for (i = middleIndex + 1, j = 0; i < this->m; i++, j++) {
-		newNode->keys[j] = keys[i];
-		newNode->sz++;
-	}//transfer subtrees
-	for (i = middleIndex + 1, j = 0; i < this->m + 1; i++, j++) {
-		newNode->p.subtree[j] = v_subtree[i];
-	}//check if splitting into root
-	if (father == this->root) {// we make a new root, because we are splitting the root node
-		Node* newRoot = new Node(this->m, false);
-		newRoot->sz = 1;
-		this->root = newRoot;
-		root->keys[0] = newKey;
-		if (key > newKey) {
-			root->p.subtree[0] = father;
-			root->p.subtree[1] = newNode;
+		#pragma region split
+		keys.insert(keys.end(), &father->keys[0], &father->keys[father->sz]);
+		v_subtree.insert(v_subtree.end(), &father->p.subtree[0], &father->p.subtree[m]);
+		it = std::upper_bound(keys.begin(), keys.end(), key);
+		int dist = std::distance(keys.begin(), it);
+		keys.insert(it, key); //insert key in sorted order
+		v_subtree.insert(v_subtree.begin() + dist + 1, child);//insert subtree at same position as the key
+		size_t middleIndex;
+		if (m % 2 == 0) middleIndex = m/2+1; //left subtree can have more nodes
+		else middleIndex = m / 2;
+		size_t newKey = keys[middleIndex];
+		father->sz = middleIndex;
+		Node* newNode = new Node(this->m, false);
+		newNode->sz = 0;
+		int i, j;
+		//transfer keys
+		for (i = middleIndex + 1, j = 0; i < this->m; i++, j++) {
+			newNode->keys[j] = keys[i];
+			newNode->sz++;
+		}//transfer subtrees
+		for (i = middleIndex + 1, j = 0; i < this->m + 1; i++, j++) {
+			newNode->p.subtree[j] = v_subtree[i];
+		}//check if splitting into root
+		#pragma endregion
+		if (father == this->root) {// we make a new root, because we are splitting the root node
+			Node* newRoot = new Node(this->m, false);
+			newRoot->sz = 1;
+			this->root = newRoot;
+			root->keys[0] = newKey;
+			if (key > newKey) {
+				root->p.subtree[0] = father;
+				root->p.subtree[1] = newNode;
+			}
+			else {
+				root->p.subtree[1] = father;
+				root->p.subtree[0] = newNode;
+			}
+			return;
 		}
 		else {
-			root->p.subtree[1] = father;
-			root->p.subtree[0] = newNode;
+			Node* grandparent = getParent(father->keys[0]);
+			key = newKey;
+			child = newNode;
+			father = grandparent;
+
 		}
 	}
-	else {
-		Node* grandparent = getParent(father->keys[0]);
-		insertInternalNode(newKey, newNode, grandparent);
-	}
+		
 }
 
 bool BPlusTree::Insert(size_t key, Data* data)
