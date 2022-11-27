@@ -24,6 +24,7 @@ BPlusTree* BPlusTree::FromFile(size_t m, std::string fname)
 		std::getline(ss, tmp_s, '|');
 		d->ca_bal = std::stod(tmp_s);
 		b->Insert(d->ca_id, d);
+		//b->Print();
 	}
 	infile.close();
 	return b;
