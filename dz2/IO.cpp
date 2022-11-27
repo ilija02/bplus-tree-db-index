@@ -1,6 +1,7 @@
 #include "BPlusTree.h"
 #include "Helpers.h"
 
+
 BPlusTree* BPlusTree::FromFile(size_t m, std::string fname)
 {
 	BPlusTree* b = new BPlusTree(m);
@@ -30,6 +31,7 @@ BPlusTree* BPlusTree::FromFile(size_t m, std::string fname)
 
 void BPlusTree::Print()
 {
+	if (this->root == nullptr) return;
 	std::queue<Node*> q;
 	q.push(this->root);
 	while (!q.empty()) {
@@ -50,6 +52,7 @@ void BPlusTree::Print()
 
 	}
 }
+
 void helpers::writeNodeToFile(Data* d, std::ofstream& out)
 {
 	std::stringstream ss;

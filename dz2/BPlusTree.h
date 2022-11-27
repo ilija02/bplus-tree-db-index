@@ -19,13 +19,16 @@ private:
 	size_t m;
 	void insertInternalNode(size_t key, Node* child, Node* father);
 	Node* getParent(size_t key);
+	void clear();
 public:
 	size_t maxKey = LLONG_MIN;
 	BPlusTree(size_t m) {
 		this->m = m;
 		this->root = nullptr;
 	} //TODO: move constructor into private section
+	~BPlusTree();
 	Node* root;
+
 	static BPlusTree* FromFile(size_t m, std::string fname);
 	bool Insert(size_t key, Data* data);
 	bool SearchSingle(size_t key, Node*& leaf, Node*& parent, size_t *took_steps, size_t* idx);//last two pointer parameters are used when finding the data of a node with given key

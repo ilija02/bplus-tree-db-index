@@ -12,7 +12,9 @@ int helpers::getSelectedMenuOption()
 	5) Pretrazivanje jednog podatka\n\
 	6) Pretrazivanje k podataka\n\
 	7) Pretrazivanje k sukcesivnih podataka\n\
-	0) Glavni meni\n";
+	8) Brisanje indeksa iz memorije\n\
+	9) Kreiranje praznog stabla\n\
+	0) Kraj rada\n";
 	std::cout << "----------------------------------------------------------------------------------------------\n";
 	std::cout << "\033[1;33mUnos: \033[0m";
 	std::cin >> selectedOption;
@@ -95,7 +97,7 @@ void helpers::mainLoop() {
 				std::cout << std::endl << "\033[1;31mGreska, kljuc ne postoji\033[0m" << std::endl;
 				continue;
 			}
-			std::cout << "Za pretragu je bilo potrebno " << took_steps << " koraka. Podaci iz cvora: "<<std::endl;
+			std::cout << "\tZa pretragu je bilo potrebno " << took_steps << " koraka. Podaci iz cvora: "<<std::endl;
 			leaf->printNodeData(idx);
 			break;
 		}
@@ -112,7 +114,7 @@ void helpers::mainLoop() {
 				keys[i] = key;
 			}
 			b->SearchMultiple(keys, &took_steps);
-			std::cout << "Za pretragu je bilo potrebno " << took_steps << " koraka." << std::endl;
+			std::cout << "\tZa pretragu je bilo potrebno " << took_steps << " koraka." << std::endl;
 			break;
 		}
 		case 7: {
@@ -127,8 +129,26 @@ void helpers::mainLoop() {
 			std::cout << "\tZa pretragu je bilo potrebno "<<took_steps<<" koraka" << std::endl;
 			break;
 		}
+		case 8: {
+			if (!nullCheckAndError(b)) continue;
+			delete b;
+			b = nullptr;
+			break;
+		}
+		case 9: {
+			delete b;
+			size_t m;
+			do {
+				std::cout << "\tRed stabla m: ";
+				std::cin >> m;
+			} while (m < 3 || m>10);
+			b = new BPlusTree(m);
+			break;
+		}
+
 		}
 	}
+	delete b;
 }
 
 bool helpers::nullCheckAndError(BPlusTree* b)

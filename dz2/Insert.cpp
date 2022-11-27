@@ -2,7 +2,6 @@
 
 void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 {
-	
 	while (true) {
 		std::vector<size_t> keys;
 		std::vector<Node*> v_subtree;
@@ -66,10 +65,9 @@ void BPlusTree::insertInternalNode(size_t key, Node* child, Node* father)
 			key = newKey;
 			child = newNode;
 			father = grandparent;
-
+			//continue in loop
 		}
-	}
-		
+	}		
 }
 
 bool BPlusTree::Insert(size_t key, Data* data)

@@ -4,7 +4,7 @@
 #include<iomanip>
 #include "BPlusTree.h"
 
-#define ZAD1_NR_OPTIONS 7
+#define ZAD1_NR_OPTIONS 9
 namespace helpers {
 	int getSelectedMenuOption();
 	void mainLoop();
