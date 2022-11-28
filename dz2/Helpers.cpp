@@ -83,7 +83,14 @@ void helpers::mainLoop() {
 			break;
 		}
 		case 4: {
-			std::cout << "Delete not implemented" << std::endl;
+			size_t key;
+			if (!nullCheckAndError(b)) continue;
+			std::cout << "\tKljuc koji zelite da obrisete: ";
+			std::cin >> key;
+			if (!b->Delete(key)) {
+				std::cout << std::endl << "\033[1;31m\tGreska, kljuc ne postoji\033[0m" << std::endl;
+				continue;
+			}
 			break;
 		}
 		case 5: {
