@@ -49,7 +49,7 @@ void BPlusTree::Print()
 			std::cout << "-";
 			cnt--;
 		}
-		std::cout << std::endl << std::endl;
+		std::cout << std::endl << std::endl<<std::endl;
 
 	}
 }
